@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AzureStorageOperations.Controllers
 {
-    public class QueueStorageController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class QueueStorageController : ControllerBase    
     {
         private readonly IQueueStorageService _storageService;
         private readonly string _connectionString;
@@ -36,7 +38,8 @@ namespace AzureStorageOperations.Controllers
             return false;
         }
 
-        [HttpGet("SendMessageToQueue")]
+        [Route("SendMessageToQueue")]
+        [HttpPost]
         public bool SendMessageToQueue(string queueName, string message)
         {
             var content =  _storageService.SendMessageToQueue(_connectionString, queueName, message);
@@ -44,7 +47,9 @@ namespace AzureStorageOperations.Controllers
         }
 
 
-        [HttpGet("SendMessageToQueue")]
+
+        [Route("UpdateMessageInQueue")]
+        [HttpPut]
         public bool UpdateMessage(string queueName, string newMessage)
         {
             var result = _storageService.UpdateMessage(_connectionString, queueName, newMessage);
@@ -52,7 +57,7 @@ namespace AzureStorageOperations.Controllers
         }
 
         [Route("DeleteQueue")]
-        [HttpGet]
+        [HttpDelete]
         public bool DeleteQueue(string queueName)
         {
             return _storageService.DeleteQueue(_connectionString, queueName);

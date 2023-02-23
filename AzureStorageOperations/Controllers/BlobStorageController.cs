@@ -47,7 +47,7 @@ namespace AzureStorageOperations.Controllers
         }
 
         [Route("DeleteFile/{fileName}")]
-        [HttpGet]
+        [HttpDelete]
         public async Task<bool> DeleteFile(string fileName)
         {
             return await _storageService.DeleteDocument(_connectionString, _container, fileName);
