@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IQueueStorageService, QueueStorageService>();
-
+builder.Services.AddScoped<ITableStorageService, TableStorageService>();
 
 
 var app = builder.Build();
@@ -20,6 +20,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GroceryStoreAPI v1"));
 }
 
 app.UseHttpsRedirection();
