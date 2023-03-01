@@ -22,7 +22,7 @@ namespace AzureStorageOperations.Controllers
 
         [HttpPost]
         [Route("InsertTableData")]
-        public async Task<IActionResult> PostAsync(GroceryItemEntity entity)
+        public async Task<IActionResult> PostAsync([FromBody] GroceryItemEntity entity)
         {
             entity.PartitionKey = entity.Category;
             string Id = Guid.NewGuid().ToString();
