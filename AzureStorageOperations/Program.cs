@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IQueueStorageService, QueueStorageService>();
 builder.Services.AddScoped<ITableStorageService, TableStorageService>();
+builder.Services.AddScoped<IFileShareStorageService, FileShareStorageService>();
 
 
 var app = builder.Build();

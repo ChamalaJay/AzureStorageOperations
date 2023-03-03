@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Storage.Files.Shares;
+using Azure.Storage.Files.Shares.Models;
 
 namespace AzureStorageOperations.Services
 {
