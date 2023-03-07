@@ -76,7 +76,7 @@ namespace AzureStorageOperations.Services
                 if (queueClient.Exists())
                 {
                     QueueMessage[] message = queueClient.ReceiveMessages();
-                    queueClient.UpdateMessage(message[0].MessageId, newMessage);
+                    queueClient.UpdateMessage(message[0].MessageId, message[0].PopReceipt, newMessage);
                     return true;
                 }
                 return false;

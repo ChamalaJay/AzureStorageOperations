@@ -32,7 +32,7 @@ namespace AzureStorageOperations.Controllers
             entity.Id = Id;
             entity.RowKey = Id;
             var createdEntity = await _storageService.UpsertEntityAsync(entity, _connectionString);
-            return CreatedAtAction(nameof(GetAsync), createdEntity);
+            return Ok(true);
         }
 
         [HttpPut]
