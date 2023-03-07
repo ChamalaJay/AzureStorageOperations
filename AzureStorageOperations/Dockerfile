@@ -10,10 +10,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["AzureStorageOperations/AzureStorageOperations.csproj", "AzureStorageOperations/"]
-RUN dotnet restore "AzureStorageOperations/AzureStorageOperations.csproj"
+COPY ["AzureStorageOperations.csproj", "./"]
+RUN dotnet restore "AzureStorageOperations.csproj"
 COPY . .
-WORKDIR "/src/AzureStorageOperations"
+WORKDIR "/src/."
 RUN dotnet build "AzureStorageOperations.csproj" -c Release -o /app/build
 
 FROM build AS publish
