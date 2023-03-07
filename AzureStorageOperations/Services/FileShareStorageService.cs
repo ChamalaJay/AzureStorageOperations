@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
+using System.Runtime.InteropServices;
 
 namespace AzureStorageOperations.Services
 {
@@ -13,71 +14,37 @@ namespace AzureStorageOperations.Services
             _config = config;
         }
 
-        public async Task FileUploadAsync(IFormFile fileDetails)
+        public async Task<bool> FileUploadAsync(IFormFile fileDetails, string connectionString, string fileshareName)
         {
-            // Get the configurations and create share object
-            ShareClient share = new ShareClient(_config.GetConnectionString("iotHubConnectionString"), _config.GetValue<string>("FileShareDetails:FileShareName"));
-
-            // Create the share if it doesn't already exist
-            await share.CreateIfNotExistsAsync();
-
-            // Check the file share is present or not
-            if (await share.ExistsAsync())
+            ShareClient shareClient = new ShareClient(connectionString, fileshareName);
+            var shareDirectoryClient = shareClient.GetDirectoryClient("");
+            var shareFileClient = shareDirectoryClient.GetFileClient(fileDetails.FileName); using (var stream = fileDetails.OpenReadStream())
             {
-                // Get a reference to the sample directory
-                ShareDirectoryClient directory = share.GetDirectoryClient("FileShareDemoFiles");
-
-                // Create the directory if it doesn't already exist
-                await directory.CreateIfNotExistsAsync();
-
-                // Ensure that the directory exists
-                if (await directory.ExistsAsync())
-                {
-                    // Get a reference to a file and upload it
-                    ShareFileClient file = directory.GetFileClient(fileDetails.FileName);
-
-                    // Check path
-                    var filesPath = Directory.GetCurrentDirectory() + "/files";
-                    var fileName = Path.GetFileName(fileDetails.FileName);
-                    var filePath = Path.Combine(filesPath, fileName);
-
-                    using (FileStream stream = File.OpenRead(filePath))
-                    {
-                        file.Create(stream.Length);
-                        file.UploadRange(
-                            new HttpRange(0, stream.Length),
-                            stream);
-                    }
-                }
+                shareFileClient.Create(stream.Length);
+                await shareFileClient.UploadRangeAsync(new HttpRange(0, fileDetails.Length), stream);
             }
-            else
-            {
-                Console.WriteLine($"File is not upload successfully");
-            }
+            return true;
+        }
+        public async Task<byte[]> FileDownloadAsync(string fileShareName, string connectionString, string fileshareName)
+        {
+            ShareClient shareClient = new ShareClient(connectionString, fileshareName);
+
+            var shareDirectoryClient = shareClient.GetDirectoryClient("");
+            var shareFileClient = shareDirectoryClient.GetFileClient(fileShareName);
+            var response = await shareFileClient.DownloadAsync();
+            using var memoryStream = new MemoryStream();
+            await response.Value.Content.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
         }
 
-        public async Task FileDownloadAsync(string fileShareName)
+        public async Task Delete(string fileName, string connectionString, string fileshareName)
         {
-            ShareClient share = new ShareClient(_config.GetConnectionString("iotHubConnectionString"), _config.GetValue<string>("FileShareDetails:FileShareName"));
-            ShareDirectoryClient directory = share.GetDirectoryClient("FileShareDemoFiles");
-            ShareFileClient file = directory.GetFileClient(fileShareName);
+            ShareClient shareClient = new ShareClient(connectionString, fileshareName);
 
-            // Check path
-            var filesPath = Directory.GetCurrentDirectory() + "/files";
-            if (!System.IO.Directory.Exists(filesPath))
-            {
-                Directory.CreateDirectory(filesPath);
-            }
-
-            var fileName = Path.GetFileName(fileShareName);
-            var filePath = Path.Combine(filesPath, fileName);
-
-            // Download the file
-            ShareFileDownloadInfo download = file.Download();
-            using (FileStream stream = File.OpenWrite(filePath))
-            {
-                await download.Content.CopyToAsync(stream);
-            }
+            var directoryClient = shareClient.GetDirectoryClient("");
+            var fileClient = directoryClient.GetFileClient(fileName);
+            await fileClient.DeleteAsync();
         }
+        
     }
 }

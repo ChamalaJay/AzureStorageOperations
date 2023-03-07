@@ -2,7 +2,9 @@
 {
     public interface IFileShareStorageService
     {
-        Task FileUploadAsync(IFormFile FileDetail);
-        Task FileDownloadAsync(string fileShareName);
+        Task<bool> FileUploadAsync(IFormFile FileDetail, string connectionString, string fileshareName);
+        Task<byte[]> FileDownloadAsync(string fileShareName, string connectionString, string fileshareName);
+
+        Task Delete(string fileName, string connectionString, string fileshareName);
     }
 }

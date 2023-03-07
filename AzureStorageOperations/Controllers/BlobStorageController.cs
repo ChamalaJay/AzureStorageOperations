@@ -27,7 +27,7 @@ namespace AzureStorageOperations.Controllers
 
         [Route("InsertFile")]
         [HttpPost]
-        public async Task<bool> InsertFile([FromForm] IFormFile asset)
+        public async Task<bool> InsertFile(IFormFile asset)
         {
             if (asset != null)
             {
